@@ -1,0 +1,65 @@
+flowchart TB
+    subgraph inputs["Outreach inputs"]
+        CM["Contact Master\n(approved CSV)"]
+        LT["Letter Template\n(path in repo)"]
+        LetterSpec["Letter Spec\n(optional ref)"]
+        FilterParams["Filter params\n(state, license type, no letter)"]
+    end
+
+    subgraph deterministic["Deterministic / rules"]
+        Filter["Filter service\n(apply state, license, no-letter)"]
+        PlaybookDerive["Playbook derivation\n(join: board → who, how, which template)"]
+    end
+
+    subgraph agents["Agents"]
+        PlaybookAgent["Playbook Generator Agent\n(optional: decide channel/tone per board)"]
+        OA["Outreach Agent\n(model + tools + prompt)"]
+    end
+
+    subgraph oa_tools["Outreach Agent tools"]
+        ReadContact["Read contact master"]
+        ReadTemplate["Read letter template"]
+        ComposeDraft["Compose draft\n(email body or form payload)"]
+        OptionalSend["Optional: send tool\n(email API, form submit)"]
+    end
+
+    subgraph human_and_automation["Human & automation"]
+        HumanReview["Human review draft\n(approve / edit)"]
+        SendOptional["Optional: send\n(record state + audit copy)"]
+        Track["Track status\n(sent, reminder, letter received)"]
+    end
+
+    subgraph stores["Stores"]
+        PlaybookStore["Outreach Playbook\n(per-board: who, how, template)"]
+        StateStore["Outreach state\n(per board status, audit copy)"]
+    end
+
+    CM --> Filter
+    LT --> Filter
+    FilterParams --> Filter
+    Filter --> PlaybookDerive
+    CM --> PlaybookDerive
+    LT --> PlaybookDerive
+    LetterSpec --> PlaybookDerive
+
+    PlaybookDerive --> PlaybookStore
+    PlaybookDerive -.->|"optional"| PlaybookAgent
+    PlaybookAgent --> PlaybookStore
+
+    PlaybookStore --> OA
+    CM --> OA
+    LT --> OA
+    OA --> ReadContact
+    OA --> ReadTemplate
+    OA --> ComposeDraft
+    ComposeDraft --> HumanReview
+    HumanReview --> SendOptional
+    SendOptional --> OptionalSend
+    SendOptional --> StateStore
+    Track --> StateStore
+
+    style inputs fill:#e8f4f8
+    style agents fill:#ffd6d6
+    style deterministic fill:#e8f0e8
+    style human_and_automation fill:#f5e6ff
+    style stores fill:#f0f0f0
