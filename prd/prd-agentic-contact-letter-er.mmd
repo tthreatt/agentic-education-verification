@@ -1,0 +1,69 @@
+erDiagram
+    BoardList ||--o{ Board : "contains"
+    Board ||--o| ContactMaster : "has one row"
+    LetterSpec ||--|| LetterTemplate : "implements"
+    ContactMaster }o--o{ LetterTemplate : "used with"
+    OutreachPlaybook ||--o{ PlaybookEntry : "contains"
+    Board ||--o| OutreachState : "has status"
+    ContactMaster ||--o| OutreachState : "used for"
+
+    BoardList {
+        string source_file "e.g. behavioral-health-state-boards-subset.csv"
+    }
+
+    Board {
+        string board_name PK
+        string source_url
+        string confluence_link "optional"
+        string base_url "derived from source_url"
+    }
+
+    ContactMaster {
+        string board_name PK,FK
+        string contact_emails
+        string contact_role_title "optional"
+        string phone "optional"
+        string contact_form_url "optional"
+        string mailing_address "optional"
+        string source_of_truth "board website | Confluence"
+        string confluence_link "optional"
+    }
+
+    LetterSpec {
+        string id PK
+        string required_clauses "e.g. attestation of PSV"
+        string scope_license_types
+        string effective_date
+        string signatory "authorized board representative"
+        string refresh_process "how to request re-sign"
+    }
+
+    LetterTemplate {
+        string id PK
+        string spec_id FK
+        string addressee "our organization"
+        string statement_of_verification
+        string scope_block
+        string signatory_block "signature/date"
+    }
+
+    OutreachPlaybook {
+        string id PK
+        string generated_at
+        string filter_criteria "state, license type, no letter on file"
+    }
+
+    PlaybookEntry {
+        string playbook_id FK
+        string board_name FK
+        string contact_method "email | form | mail"
+        string template_id FK
+        string who_to_contact "from contact master"
+    }
+
+    OutreachState {
+        string board_name PK,FK
+        string status "draft | request_sent | reminder_sent | letter_received"
+        datetime last_contacted "optional"
+        string sent_content_copy "audit copy, optional"
+    }

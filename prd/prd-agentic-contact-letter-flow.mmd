@@ -1,0 +1,51 @@
+flowchart TB
+    subgraph inputs["Inputs"]
+        BoardCSV["Board list CSV\n(board name, source URL, Confluence link)"]
+        Docs["Docs / refs\n(meeting notes, scope, NCQA/CAQH optional)"]
+    end
+
+    subgraph contact_discovery["Contact Discovery"]
+        CD_Agent["Contact Discovery Agent\n(HTTP, browser, parsing)"]
+        CD_Agent --> DeriveBaseURL["Derive base URL\nfrom source URL"]
+        DeriveBaseURL --> Scrape["Scrape board site\n(contact, about, staff)"]
+        Scrape --> OptionalConfluence["Optional: Confluence\n(enrich contact)"]
+        OptionalConfluence --> ContactMaster["Contact Master\n(structured CSV)"]
+        ContactMaster --> HumanReviewContact["Human review & correct\ncontact master"]
+    end
+
+    subgraph letter_content["Letter Content"]
+        LC_Agent["Letter Content Agent\n(prompt + retrieval over docs)"]
+        LC_Agent --> LetterSpec["Letter Spec\n(required clauses, signatory, refresh)"]
+        LetterSpec --> LetterTemplate["Letter Template\n(Word/Markdown, implements spec)"]
+        LetterTemplate --> StoreInRepo["Store in repo\n(docs/ or research/)"]
+    end
+
+    subgraph outreach["Outreach"]
+        Filter["Filter boards\n(state, license type, no letter)"]
+        PlaybookGen["Generate Outreach Playbook\n(per board: who, how, which template)"]
+        OA["Outreach Agent\n(read contact master + template)"]
+        Draft["Draft per-board outreach\n(email body or form payload)"]
+        HumanReviewDraft["Human review draft\n(optional)"]
+        SendOptional["Optional: send\n(record state + audit copy)"]
+        Track["Track status\n(sent, reminder, letter received)"]
+    end
+
+    BoardCSV --> CD_Agent
+    Docs --> LC_Agent
+
+    HumanReviewContact --> ContactMasterFinal["Contact Master (approved)"]
+    StoreInRepo --> LetterTemplatePath["Letter template path"]
+
+    ContactMasterFinal --> Filter
+    LetterTemplatePath --> Filter
+    Filter --> PlaybookGen
+    PlaybookGen --> OA
+    OA --> Draft
+    Draft --> HumanReviewDraft
+    HumanReviewDraft --> SendOptional
+    SendOptional --> Track
+
+    style inputs fill:#e8f4f8
+    style contact_discovery fill:#fff4e6
+    style letter_content fill:#f0f8e8
+    style outreach fill:#f5e6ff
