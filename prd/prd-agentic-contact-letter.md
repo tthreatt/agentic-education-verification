@@ -79,6 +79,24 @@ Education verification today relies on knowing **where** to look up credentials 
 - **Playbook as derived artifact:** The outreach playbook can be generated from the contact master + letter spec (e.g. one row per board with “contact email,” “channel,” “template version”) so it stays in sync with data.
 - **Human-in-the-loop:** Contact Discovery and Outreach should assume a human reviews contact data and optionally each draft before send; the UI can be “file in repo + script output” for the prototype.
 
+### 6.1 Outreach: when agentic vs. deterministic
+
+Outreach does **not** have to be agentic. The same flow can be implemented with Filter → Playbook derivation → template fill → human review → optional send → track, using a template engine (e.g. Jinja or simple variable substitution) and no LLM.
+
+**Agentic design is preferred when:**
+
+- You need **per-board judgment**: e.g. adapt tone (formal vs. brief), choose channel (email vs. form) when multiple exist, or handle missing/incomplete contact data with fallback wording.
+- You want one component to own "read contact + template → produce draft" so it can **reason over edge cases** (e.g. "contact form only" vs. "email + form") and keep wording consistent with the letter spec.
+- Playbook generation should **recommend strategy** (who to contact first, how to phrase the ask) rather than only joining static fields.
+
+**A non-agentic (deterministic) design is preferable when:**
+
+- The task is **fully templated**: same letter body, only board name and contact name substituted; no need to adapt phrasing or channel.
+- You want **low cost and simple ops**: a template engine + Filter + Playbook (as a derived table) is easier to debug and run than an LLM.
+- **Compliance or audit** requires every board to receive byte-for-byte identical text; then a fixed template + variable substitution is safer than an agent-generated draft.
+
+For "draft per-board outreach (email body or form payload)" with optional human review, the **Outreach Agent** is the core agentic piece when chosen; the **Playbook** can stay derived (non-agentic) unless you explicitly want per-board strategy from an LLM. See [prd-agentic-contact-letter-diagrams.md](./prd-agentic-contact-letter-diagrams.md) (Outreach Architecture Diagram) for the component breakdown.
+
 ---
 
 ## 7. Technical Considerations
