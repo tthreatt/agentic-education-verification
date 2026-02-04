@@ -1,0 +1,6 @@
+# IDE / tooling
+.cursor/
+.ai-dev-tasks-temp/
+
+# macOS
+.DS_Store
