@@ -1,0 +1,12 @@
+Here's my takeaway from that convo:
+Problem: education verification is highly manualPotential solution #1: many board certs include primary source verification, so if we can get responses from boards to understand who has verified education, we could eliminate a large percentage (~80%?) of the need for individual verificationPotential solution #2: if a clinician doesn't have a board cert that we have record of verifying education, then we could potentially automate the communication with the education institution verifying individuals At some point in the future, both solutions maybe live within one agentic flow where agents for solution 1 and 2 exist as subagents for a "Education Verification Automation" agent acting as orchestrator (this assumes both solutions justify agentic solution, rather than something more programmatic) 
+
+Solution #1 above is likely the biggest immediate win (solve 1 problem that eliminates thousands), assuming we can scope it correctly.
+
+To do:
+@Tony & @tcox to create a workflow document that outlines this process in more detail to highlight areas of ambiguity (where agents would be most useful)@aistfan & @mtrevino to begin thinking through how we'd set up agents in Strands to send forms, capture the data, and store it in a way that's meaningful
+
+Potential for three agents (maybe?)
+Discovery Agent: Analyzes board bylaws and public policies to identify which specialty boards perform primary source verification (PSV) of education, creating an initial "Proxy Eligible" master listOutreach Agent: Contacts boards that do not have clear PSV documentation online to secure formal letters or statements confirming their verification standards meet our compliance requirementsValidation Agent: Operates the daily workflow by checking a clinician's board status against the proxy list and either capturing the "verified" badge as proof or escalating to direct university contact when necessaryCould imagine there being a subagent of validation or a fourth agent who handles outreach to the education institution (maybe that's the same agent as "Outreach" just directed to send a different message to a different persona?)
+
+Obviously not all possible in two weeks, but discovery+outreach seems like the initial scope we discussed today
